@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>サロンを選ぶ｜MANABU IWATA HAIR</title>
+<meta name="description" content="岩田 学のご予約。大宮の Agu. gina、日進の fossette からお選びください。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{padding-bottom:24px}
+  .salon{display:block;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+         box-shadow:0 4px 14px rgba(63,51,39,.06);transition:transform .08s}
+  .salon + .salon{margin-top:16px}
+  .salon:active{transform:scale(.99)}
+  .salon .ph{position:relative}
+  .salon .ph img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+  .salon .station{position:absolute;right:10px;bottom:10px;background:rgba(255,252,247,.94);border-radius:999px;
+         padding:3px 12px;font-size:12px;font-weight:600}
+  .salon .body{padding:14px 16px 16px}
+  .salon .nm{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .salon .nm b{font-family:var(--serif);font-size:21px;letter-spacing:.03em}
+  .salon .nm small{font-size:12px;color:var(--sub)}
+  .salon .when{font-size:13.5px;margin:6px 0 10px}
+  .salon .go{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;min-height:48px;border-radius:12px;
+         background:var(--cta);color:#fff;font-weight:700;font-size:15px}
+  .salon.fos .go{background:var(--line-green)}
+  .links{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .who{display:flex;gap:12px;align-items:center;justify-content:center;padding:6px 20px 0}
+  .who img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+  .who p{font-size:13px;color:var(--sub);line-height:1.6}
+  .who b{font-family:var(--serif);color:var(--ink);font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><b>MANABU IWATA HAIR</b><span>ご予約</span></div>
+
+  <section class="lead" style="padding-top:8px">
+    <h1>ご希望のサロンを<br>お選びください</h1>
+    <p>車でも、駅からでも。来やすいサロンをどうぞ</p>
+  </section>
+
+  <div class="who">
+    <img src="img/iwata.jpg" alt="岩田 学">
+    <p>担当 <b>岩田 学</b><br>どちらのサロンでも指名料0円です</p>
+  </div>
+
+  <section class="block">
+    <a class="salon" href="agu.html">
+      <div class="ph">
+        <img src="img/agu-salon.jpg" alt="Agu. gina の店内">
+        <span class="station">大宮駅 東口 徒歩5分</span>
+      </div>
+      <div class="body">
+        <div class="nm"><b>Agu. gina</b><small>HAIR SALON</small></div>
+        <p class="when">月〜金　10:00〜16:00／19:00〜23:00<br><span style="color:var(--sub);font-size:12.5px">夜23時まで。会社帰りでも大丈夫</span></p>
+        <div class="tags"><span class="tag hp">ホットペッパーで予約</span><span class="tag">土日休み</span></div>
+        <span class="go">Agu. で予約する ›</span>
+      </div>
+    </a>
+
+    <a class="salon fos" href="fossette.html">
+      <div class="ph">
+        <img src="img/fossette-hero.jpg" alt="fossette hair &amp; eyelash" style="aspect-ratio:auto">
+      </div>
+      <div class="body">
+        <div class="nm"><b>fossette</b><small>hair &amp; eyelash</small></div>
+        <p class="when">おもに土曜の午前<br><span style="color:var(--sub);font-size:12.5px">平日もご相談ください</span></p>
+        <div class="tags"><span class="tag ln">LINEで予約</span><span class="tag">日進駅 徒歩10分</span><span class="tag">駐車場あり</span></div>
+        <span class="go">fossette で予約する ›</span>
+      </div>
+    </a>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="links">
+      <a class="sub-btn" href="menu.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        メニュー・料金
+      </a>
+      <a class="sub-btn" href="soudan.html">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.4A8 8 0 1 1 21 12z"/></svg>
+        相談する
+      </a>
+    </div>
+    <p class="foot">MANABU IWATA HAIR</p>
+  </section>
+</div>
+</body>
+</html>

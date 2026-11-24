@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>メニュー・料金｜MANABU IWATA HAIR</title>
+<meta name="description" content="カット・カラー・パーマ・トリートメント・縮毛矯正のメニューと料金（税込）。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .menu-title{text-align:center;padding:22px 20px 6px}
+  .menu-title small{display:block;font-size:11px;letter-spacing:.24em;color:var(--sub)}
+  .menu-title h1{font-family:var(--serif);font-size:34px;letter-spacing:.2em;font-weight:500;line-height:1.3}
+  .menu-title p{font-size:12px;color:var(--sub)}
+  .jump{display:flex;gap:6px;overflow-x:auto;padding:10px 20px 4px;scrollbar-width:none;position:sticky;top:0;background:var(--bg);z-index:5}
+  .jump::-webkit-scrollbar{display:none}
+  .jump a{flex:none;font-size:13px;text-decoration:none;padding:6px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+  .cat{scroll-margin-top:56px}
+  .cat h2 .en{font-size:12px;letter-spacing:.18em;color:var(--sub);font-family:var(--sans);font-weight:400;margin-left:auto}
+  .items{list-style:none}
+  .items li{display:flex;align-items:baseline;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .items li:last-child{border-bottom:0}
+  .items .nm small{display:block;font-size:12px;color:var(--sub)}
+  .items .dots{flex:1}
+  .items .pr{font-family:var(--serif);font-weight:700;font-size:16px;white-space:nowrap}
+  .items .pr i{font-style:normal;font-size:12px;font-weight:500;color:var(--sub);margin-left:1px}
+  .opt{background:var(--soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><b>MANABU IWATA HAIR</b><a href="index.html">予約する ›</a></div>
+
+  <section class="menu-title">
+    <small>HAIR &amp; EYELASH SALON</small>
+    <h1>MENU</h1>
+    <p>価格はすべて税込です</p>
+  </section>
+
+  <nav class="jump" aria-label="メニューの種類">
+    <a href="#cut">カット</a><a href="#color">カラー</a><a href="#perm">パーマ</a><a href="#tr">トリートメント</a><a href="#st">縮毛矯正</a><a href="#op">オプション</a>
+  </nav>
+
+  <section class="block">
+    <div class="card cat" id="cut">
+      <h2>カット <span class="en">CUT</span></h2>
+      <ul class="items">
+        <li><span class="nm">カット<small>シャンプー・ブロー込み</small></span><span class="dots"></span><span class="pr">¥5,500</span></li>
+        <li><span class="nm">学生カット</span><span class="dots"></span><span class="pr">¥4,400</span></li>
+      </ul>
+    </div>
+
+    <div class="card cat" id="color">
+      <h2>カラー <span class="en">COLOR</span></h2>
+      <ul class="items">
+        <li><span class="nm">カラーリタッチ</span><span class="dots"></span><span class="pr">¥6,600<i>〜</i></span></li>
+        <li><span class="nm">フルカラー</span><span class="dots"></span><span class="pr">¥7,700<i>〜</i></span></li>
+        <li><span class="nm">ブリーチ</span><span class="dots"></span><span class="pr">¥9,900<i>〜</i></span></li>
+        <li><span class="nm">ポイントハイライト</span><span class="dots"></span><span class="pr">¥5,500<i>〜</i></span></li>
+        <li><span class="nm">全体ハイライト</span><span class="dots"></span><span class="pr">¥7,700<i>〜</i></span></li>
+      </ul>
+      <ul class="note">
+        <li>カットなしの場合、シャンプー・ブロー代 ¥1,100</li>
+        <li>ロング料金 ¥1,100</li>
+      </ul>
+    </div>
+
+    <div class="card cat" id="perm">
+      <h2>パーマ <span class="en">PERM</span></h2>
+      <ul class="items">
+        <li><span class="nm">カット＋パーマ</span><span class="dots"></span><span class="pr">¥13,200<i>〜</i></span></li>
+      </ul>
+    </div>
+
+    <div class="card cat" id="tr">
+      <h2>トリートメント <span class="en">TREATMENT</span></h2>
+      <ul class="items">
+        <li><span class="nm">髪質改善 酸熱トリートメント</span><span class="dots"></span><span class="pr">¥8,800</span></li>
+        <li><span class="nm">トリートメント</span><span class="dots"></span><span class="pr">¥2,750<i>〜</i></span></li>
+        <li><span class="nm">ヘッドスパ</span><span class="dots"></span><span class="pr">¥4,400</span></li>
+        <li><span class="nm">シャンプーブロー</span><span class="dots"></span><span class="pr">¥4,400</span></li>
+      </ul>
+      <ul class="note"><li>カットなしの場合、シャンプー・ブロー代 ¥1,100</li></ul>
+    </div>
+
+    <div class="card cat" id="st">
+      <h2>縮毛矯正 <span class="en">STRAIGHT</span></h2>
+      <ul class="items">
+        <li><span class="nm">ポイント縮毛矯正</span><span class="dots"></span><span class="pr">¥6,600<i>〜</i></span></li>
+        <li><span class="nm">縮毛矯正</span><span class="dots"></span><span class="pr">¥16,500</span></li>
+      </ul>
+    </div>
+
+    <div class="card cat opt" id="op">
+      <h2>オプション <span class="en">OPTION</span></h2>
+      <ul class="items">
+        <li><span class="nm">marbb（マーブ）マイクロバブル<small>毛穴の奥の汚れや皮脂をやさしく洗い、頭皮も髪もすっきり</small></span><span class="dots"></span><span class="pr">+¥1,100</span></li>
+      </ul>
+    </div>
+
+    <p class="cta-note" style="margin:16px 0 12px">Agu. gina はホットペッパーのクーポンもあります（予約画面で選べます）</p>
+    <a class="cta" href="index.html">サロンを選んで予約する</a>
+    <a class="back" href="soudan.html" style="margin-top:8px">メニューに迷ったら、LINEで相談 ›</a>
+    <p class="foot">MANABU IWATA HAIR</p>
+  </section>
+</div>
+</body>
+</html>
