@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>fossette ご予約フォーム｜MANABU IWATA HAIR</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+  .q{margin-bottom:4px}
+  .q-label{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;margin-bottom:8px}
+  .req,.opt{font-size:11px;font-weight:600;padding:1px 7px;border-radius:4px}
+  .req{background:var(--cta);color:#fff}
+  .opt{background:var(--soft);color:var(--sub)}
+  .hint{font-size:12px;color:var(--sub);margin:-4px 0 8px}
+
+  /* 選ぶボタン（チップ） */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{position:relative}
+  .chip input{position:absolute;opacity:0;inset:0;margin:0}
+  .chip span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:44px;padding:6px 14px;
+     border:1px solid var(--line);border-radius:12px;background:#fff;font-size:14px;line-height:1.35;text-align:center;cursor:pointer}
+  .chip small{font-size:11px;color:var(--sub)}
+  .chip input:checked + span{border-color:var(--leaf);background:#eef3e9;box-shadow:inset 0 0 0 1px var(--leaf);font-weight:700}
+  .chip input:checked + span small{color:var(--leaf)}
+  .chip input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+  .chips.two .chip{flex:1 1 calc(50% - 4px)}
+  .chips.two .chip span{width:100%}
+  .group-title{font-size:12px;color:var(--sub);margin:12px 0 6px;letter-spacing:.06em}
+  .group-title:first-of-type{margin-top:0}
+
+  /* 入力 */
+  .field{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff;
+     font:inherit;font-size:16px;color:var(--ink)}
+  .field:focus{outline:2px solid var(--gold);outline-offset:0;border-color:transparent}
+  textarea.field{min-height:96px;resize:vertical}
+  .row{display:grid;grid-template-columns:1.25fr 1fr;gap:8px;align-items:center}
+  .wish + .wish{margin-top:10px}
+  .wish-no{font-size:12px;color:var(--sub);margin-bottom:4px}
+  .sat{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 10px}
+  .sat::-webkit-scrollbar{display:none}
+  .sat button{flex:none;border:1px dashed var(--leaf);background:#fff;color:var(--leaf);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px}
+  .err{color:var(--cta);font-size:12.5px;margin-top:6px;display:none}
+  .q.bad .err{display:block}
+  .q.bad .chips span,.q.bad .field{border-color:var(--cta)}
+
+  .estimate{display:flex;justify-content:space-between;align-items:baseline;background:var(--soft);border-radius:12px;padding:12px 14px;margin-top:12px}
+  .estimate b{font-family:var(--serif);font-size:20px}
+  .estimate small{display:block;font-size:11px;color:var(--sub)}
+
+  /* 下のボタン（いつも見える） */
+  .bottom{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+     background:linear-gradient(to top,var(--bg) 70%,rgba(246,239,228,0));z-index:10}
+  .bottom .cta{max-width:448px;margin:0 auto;border:0;font-family:inherit;cursor:pointer}
+
+  /* 確認画面 */
+  .sheet{position:fixed;inset:0;background:rgba(40,30,20,.45);display:none;align-items:flex-end;z-index:20}
+  .sheet.open{display:flex}
+  .sheet-in{background:var(--bg);width:100%;max-width:480px;margin:0 auto;max-height:92vh;overflow:auto;
+     border-radius:20px 20px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom))}
+  .sheet h2{font-family:var(--serif);font-size:18px;text-align:center;margin-bottom:4px}
+  .sheet .sub{text-align:center;font-size:12px;color:var(--sub);margin-bottom:12px}
+  .preview{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14px;line-height:1.75}
+  .btns{display:grid;gap:10px;margin-top:14px}
+  .ghost{min-height:48px;border-radius:999px;border:1px solid var(--line);background:#fff;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
+
+  /* 送った後 */
+  .done{display:none;text-align:center;padding:40px 24px}
+  .done.show{display:block}
+  .done .mark{width:64px;height:64px;border-radius:50%;background:var(--line-green);display:grid;place-items:center;margin:0 auto 16px}
+  .done h1{font-family:var(--serif);font-size:21px;margin-bottom:8px}
+  .done p{font-size:14px;color:var(--sub)}
+  .done .card{text-align:left;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap" id="formView">
+  <div class="topbar"><b>fossette</b><span>ご予約フォーム</span></div>
+
+  <section class="lead" style="padding-top:6px">
+    <h1>ご予約のリクエスト</h1>
+    <p>入力して送ると、LINEのトークで岩田に届きます。<br>空きを確認して、トークでお返事します。</p>
+  </section>
+
+  <form class="block" id="f" novalidate>
+    <div class="card q" data-q="menu">
+      <div class="q-label">ご希望のメニュー <span class="req">必須</span></div>
+      <p class="hint">いくつでも選べます</p>
+      <div id="menuChips"></div>
+      <div id="bleachBox" style="display:none;margin-top:12px">
+        <div class="group-title">ブリーチ・ダブルカラー</div>
+        <div class="chips two">
+          <label class="chip"><input type="radio" name="bleach" value="なし" checked><span>なし</span></label>
+          <label class="chip"><input type="radio" name="bleach" value="希望する"><span>希望する</span></label>
+        </div>
+      </div>
+      <div class="estimate" id="estimate" hidden>
+        <span>目安の料金<small>税込・長さや髪の状態で変わります</small></span><b id="estimateVal"></b>
+      </div>
+      <p class="err">メニューを1つ以上選んでください</p>
+    </div>
+
+    <div class="card q" data-q="wish">
+      <div class="q-label">ご希望の日にち・時間 <span class="req">第1希望は必須</span></div>
+      <p class="hint">fossette はおもに<b>土曜の午前</b>です。平日もご相談ください。</p>
+      <div class="sat" id="satChips" aria-label="近い土曜日"></div>
+      <div id="wishes"></div>
+      <textarea class="field" name="wishNote" rows="2" placeholder="例：土曜ならいつでも大丈夫／12月中旬まで" style="margin-top:10px;min-height:64px"></textarea>
+      <p class="err">第1希望の日にちを選んでください</p>
+    </div>
+
+    <div class="card q" data-q="name">
+      <div class="q-label">お名前 <span class="req">必須</span></div>
+      <input class="field" name="name" autocomplete="name" placeholder="例：山田 花子">
+      <p class="err">お名前を入れてください</p>
+      <div class="q-label" style="margin-top:14px">ご来店 <span class="req">必須</span></div>
+      <div class="chips two">
+        <label class="chip"><input type="radio" name="visit" value="はじめて" checked><span>はじめて</span></label>
+        <label class="chip"><input type="radio" name="visit" value="2回目以降"><span>2回目以降</span></label>
+      </div>
+      <div class="q-label" style="margin-top:14px">お電話番号 <span class="opt">任意</span></div>
+      <input class="field" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="当日の連絡用（なくても大丈夫）">
+    </div>
+
+    <div class="card q">
+      <div class="q-label">髪のお悩み・ご要望 <span class="opt">任意</span></div>
+      <textarea class="field" name="note" placeholder="例：広がりやすい／前回の色が抜けてきた／肩くらいまで切りたい"></textarea>
+      <ul class="note">
+        <li>なりたいスタイルの画像は、送ったあとにトークで送ってください</li>
+        <li>当日しっかりカウンセリングしますので、決まっていなくても大丈夫です</li>
+      </ul>
+    </div>
+  </form>
+</div>
+
+<div class="done" id="doneView">
+  <div class="mark"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></div>
+  <h1>送りました</h1>
+  <p>リクエストを受け付けました。<br>空きを確認して、LINEのトークでお返事します。</p>
+  <div class="card">
+    <ul class="checks">
+      <li><span>まだ予約は<b>確定していません</b>。お返事をお待ちください</span></li>
+      <li><span>スタイルの画像があれば、トークで送ってください</span></li>
+      <li><span>お返事に少しお時間をいただくことがあります</span></li>
+    </ul>
+  </div>
+  <button class="cta line" id="closeBtn" style="margin-top:20px;border:0;font-family:inherit">トークにもどる</button>
+</div>
+
+<div class="bottom" id="bottomBar">
+  <button class="cta line" type="button" id="toConfirm">入力内容を確認する</button>
+</div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-in">
+    <h2 id="sheetTitle">この内容で送ります</h2>
+    <p class="sub">LINEのトークに、あなたから送られます</p>
+    <div class="preview" id="preview"></div>
+    <div class="btns">
+      <button class="cta line" type="button" id="sendBtn" style="border:0;font-family:inherit">LINEで送る</button>
+      <button class="ghost" type="button" id="backBtn">なおす</button>
+    </div>
+  </div>
+</div>
+
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script>
+/* ===== 設定 ===== */
+const LIFF_ID = '2012781068-vo18NACb';               // LINE Developers の LIFF ID（決まったらここに入れる）
+const OA_ID   = '@426pnlkr';        // 公式LINEのID（LIFFが使えないときの予備）
+// 送ったあと、このことばを2通目に送る → 応答メッセージ（キーワード）で「受け付けました」を返せる
+const DONE_KEYWORD = 'fossette予約リクエストを送りました';
+
+/* ===== メニュー（menu.html と同じ値段） ===== */
+const MENU = [
+  {g:'カット', items:[['カット',5500,''],['学生カット',4400,'']]},
+  {g:'カラー', items:[['カラーリタッチ',6600,'〜'],['フルカラー',7700,'〜'],['ポイントハイライト',5500,'〜'],['全体ハイライト',7700,'〜']], color:true},
+  {g:'パーマ・縮毛矯正', items:[['カット＋パーマ',13200,'〜'],['ポイント縮毛矯正',6600,'〜'],['縮毛矯正',16500,'']]},
+  {g:'トリートメント・スパ', items:[['髪質改善 酸熱トリートメント',8800,''],['トリートメント',2750,'〜'],['ヘッドスパ',4400,''],['シャンプーブロー',4400,'']]},
+  {g:'オプション', items:[['marbb マイクロバブル',1100,'']]},
+  {g:'そのほか', items:[['相談して決めたい',0,'']]},
+];
+const yen = n => '¥' + n.toLocaleString('ja-JP');
+const W = ['日','月','火','水','木','金','土'];
+
+/* メニューのチップを作る */
+const menuBox = document.getElementById('menuChips');
+MENU.forEach(sec => {
+  const t = document.createElement('div'); t.className = 'group-title'; t.textContent = sec.g; menuBox.appendChild(t);
+  const wrap = document.createElement('div'); wrap.className = 'chips';
+  sec.items.forEach(([name, price, from]) => {
+    const l = document.createElement('label'); l.className = 'chip';
+    l.innerHTML = `<input type="checkbox" name="menu" value="${name}" data-price="${price}" data-from="${from}" ${sec.color?'data-color="1"':''}>
+      <span>${name}${price ? `<small>${yen(price)}${from}</small>` : ''}</span>`;
+    wrap.appendChild(l);
+  });
+  menuBox.appendChild(wrap);
+});
+
+/* 目安の料金・ブリーチ */
+function updateMenu(){
+  const sel = [...document.querySelectorAll('input[name=menu]:checked')];
+  const sum = sel.reduce((a,i)=>a + +i.dataset.price, 0);
+  const from = sel.some(i=>i.dataset.from) || sel.some(i=>+i.dataset.price===0);
+  // カットなしでカラー・トリートメントだけ → シャンプー・ブロー代
+  const hasCut = sel.some(i=>/カット/.test(i.value));
+  const needsBlow = !hasCut && sel.some(i=>i.dataset.color || /トリートメント$/.test(i.value));
+  const total = sum + (needsBlow ? 1100 : 0);
+  document.getElementById('estimate').hidden = !total;
+  document.getElementById('estimateVal').textContent = yen(total) + (from ? '〜' : '');
+  document.getElementById('bleachBox').style.display = sel.some(i=>i.dataset.color) ? '' : 'none';
+}
+menuBox.addEventListener('change', updateMenu);
+
+/* 希望日 3つ */
+const wishes = document.getElementById('wishes');
+const today = new Date(); today.setHours(0,0,0,0);
+const iso = d => new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+for (let i=1;i<=3;i++){
+  const w = document.createElement('div'); w.className = 'wish';
+  w.innerHTML = `<div class="wish-no">第${i}希望${i>1?'（あれば）':''}</div>
+    <div class="row">
+      <input class="field" type="date" name="d${i}" min="${iso(tomorrow)}" aria-label="第${i}希望の日にち">
+      <select class="field" name="t${i}" aria-label="第${i}希望の時間">
+        <option>午前</option><option>お昼すぎ</option><option>夕方</option><option>何時でも</option>
+      </select>
+    </div>`;
+  wishes.appendChild(w);
+}
+/* 近い土曜日をワンタップで入れる */
+const sat = document.getElementById('satChips');
+let d = new Date(tomorrow); while (d.getDay()!==6) d.setDate(d.getDate()+1);
+for (let k=0;k<4;k++){
+  const day = new Date(d); day.setDate(d.getDate()+7*k);
+  const b = document.createElement('button'); b.type='button';
+  b.textContent = `${day.getMonth()+1}/${day.getDate()}(土)`;
+  b.onclick = () => {
+    const empty = [1,2,3].map(n=>document.querySelector(`[name=d${n}]`)).find(x=>!x.value) || document.querySelector('[name=d1]');
+    empty.value = iso(day); empty.dispatchEvent(new Event('change')); clearBad();
+  };
+  sat.appendChild(b);
+}
+const fmtDate = v => { const x = new Date(v+'T00:00:00'); return `${x.getMonth()+1}/${x.getDate()}(${W[x.getDay()]})`; };
+
+/* チェック */
+const f = document.getElementById('f');
+const E = f.elements;
+function clearBad(){ document.querySelectorAll('.q.bad').forEach(q=>{ if (check(q.dataset.q)) q.classList.remove('bad'); }); }
+function check(k){
+  if (k==='menu') return !!document.querySelector('input[name=menu]:checked');
+  if (k==='wish') return !!E.d1.value;
+  if (k==='name') return !!E.name.value.trim();
+  return true;
+}
+f.addEventListener('input', clearBad); f.addEventListener('change', clearBad);
+
+/* 送る文 */
+function buildText(){
+  const sel = [...document.querySelectorAll('input[name=menu]:checked')].map(i=>i.value);
+  const bleach = document.querySelector('input[name=bleach]:checked').value;
+  const hasColor = [...document.querySelectorAll('input[name=menu]:checked')].some(i=>i.dataset.color);
+  const lines = ['【fossette ご予約リクエスト】', ''];
+  lines.push('■ お名前', E.name.value.trim() + '（' + E.visit.value + '）', '');
+  lines.push('■ メニュー', sel.join('、') + (hasColor ? `\nブリーチ・ダブルカラー：${bleach}` : ''));
+  const est = document.getElementById('estimate');
+  if (!est.hidden) lines.push('目安：' + document.getElementById('estimateVal').textContent);
+  lines.push('', '■ ご希望の日にち');
+  [1,2,3].forEach(n => { const v = E['d'+n].value; if (v) lines.push(`第${n}希望　${fmtDate(v)} ${E['t'+n].value}`); });
+  if (E.wishNote.value.trim()) lines.push(E.wishNote.value.trim());
+  if (E.tel.value.trim()) lines.push('', '■ お電話番号', E.tel.value.trim());
+  if (E.note.value.trim()) lines.push('', '■ お悩み・ご要望', E.note.value.trim());
+  return lines.join('\n');
+}
+
+/* 確認 → 送る */
+const sheet = document.getElementById('sheet');
+document.getElementById('toConfirm').onclick = () => {
+  const bad = ['menu','wish','name'].filter(k=>!check(k));
+  document.querySelectorAll('.q').forEach(q=>q.classList.toggle('bad', bad.includes(q.dataset.q)));
+  if (bad.length){ document.querySelector(`.q[data-q=${bad[0]}]`).scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  document.getElementById('preview').textContent = buildText();
+  sheet.classList.add('open');
+};
+document.getElementById('backBtn').onclick = () => sheet.classList.remove('open');
+
+let liffReady = false;
+async function startLiff(){
+  if (!LIFF_ID || !window.liff) return;
+  try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); } catch(e){ liffReady = false; }
+}
+startLiff();
+
+const sendBtn = document.getElementById('sendBtn');
+sendBtn.onclick = async () => {
+  const text = buildText();
+  sendBtn.disabled = true; sendBtn.textContent = '送っています…';
+  if (liffReady){
+    try {
+      // お客さん本人のメッセージとしてトークに送る（公式LINEの送信数には入らない）
+      await liff.sendMessages([{type:'text', text}, {type:'text', text: DONE_KEYWORD}]);
+      sheet.classList.remove('open'); showDone(); return;
+    } catch(e){ /* だめなときは下の予備の方法へ */ }
+  }
+  // 予備：LINEのトークを開いて、文を入れた状態にする（お客さんが送信を押す）
+  location.href = `https://line.me/R/oaMessage/${encodeURIComponent(OA_ID)}/?${encodeURIComponent(text)}`;
+  setTimeout(()=>{ sendBtn.disabled=false; sendBtn.textContent='LINEで送る'; }, 1500);
+};
+function showDone(){
+  document.getElementById('formView').style.display='none';
+  document.getElementById('bottomBar').style.display='none';
+  document.getElementById('doneView').classList.add('show');
+  scrollTo(0,0);
+}
+document.getElementById('closeBtn').onclick = () => { if (liffReady) liff.closeWindow(); else location.href = 'fossette.html'; };
+</script>
+</body>
+</html>
