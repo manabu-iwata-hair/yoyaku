@@ -23,7 +23,7 @@
   </section>
 
   <section class="block">
-    <a class="cta line" data-main-cta href="https://liff.line.me/2012781068-vo18NACb">
+    <a class="cta line" data-main-cta href="https://liff.line.me/2012781068-vo18NACb" data-liff>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       予約フォームを開く
     </a>
@@ -101,8 +101,14 @@
 </div>
 
 <div class="sticky">
-  <a class="cta line" href="https://liff.line.me/2012781068-vo18NACb">予約フォームを開く</a>
+  <a class="cta line" href="https://liff.line.me/2012781068-vo18NACb" data-liff>予約フォームを開く</a>
 </div>
 <script src="sticky.js"></script>
+<script>
+// LINEの中のブラウザでは line://app/ で開く（フォーム用の画面 LIFF で開かせるため）
+if (/ Line\//i.test(navigator.userAgent)) {
+  document.querySelectorAll('a[data-liff]').forEach(a => a.href = 'line://app/2012781068-vo18NACb');
+}
+</script>
 </body>
 </html>
