@@ -376,12 +376,23 @@ async function startLiff(){
   if (!LIFF_ID || !window.liff) return;
   try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); } catch(e){ liffReady = false; }
   // トークに送る許可（chat_message.write）がまだなら、最初に許可の画面を出す（入力の前に）
+  const dbg = [];
   if (liffReady){
     try {
+      const c = liff.getContext() || {};
+      dbg.push('type=' + c.type, 'scope=' + (c.scope||[]).join(','), 'v=' + liff.getVersion());
       const p = await liff.permission.query('chat_message.write');
+      dbg.push('perm=' + p.state);
       if (p.state !== 'granted') await liff.permission.requestAll();
-    } catch(e){}
+    } catch(e){ dbg.push('err=' + (e.code||'') + ' ' + (e.message||e)); }
+  } else {
+    dbg.push('inClient=' + (window.liff && liff.isInClient ? liff.isInClient() : 'none'));
   }
+  // 確認用（あとで消す）：いちばん下に小さく出す
+  const d = document.createElement('p');
+  d.style.cssText = 'font-size:10px;color:#aaa;text-align:center;padding:8px 16px 120px;word-break:break-all';
+  d.textContent = '確認用：' + dbg.join(' / ');
+  document.body.appendChild(d);
 }
 startLiff();
 
