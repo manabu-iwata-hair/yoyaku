@@ -105,9 +105,9 @@
 </div>
 <script src="sticky.js"></script>
 <script>
-// LINEの中のブラウザでは line://app/ で開く（フォーム用の画面 LIFF で開かせるため）
-if (/ Line\//i.test(navigator.userAgent)) {
-  document.querySelectorAll('a[data-liff]').forEach(a => a.href = 'line://app/2012781068-vo18NACb');
+// LINEのフォーム用の画面（LIFF）の中なら、そのままフォームへ進む（トークから開いた情報を引きつぐため）
+if (/LIFF/i.test(navigator.userAgent)) {
+  document.querySelectorAll('a[data-liff]').forEach(a => a.href = 'fossette-form.html');
 }
 </script>
 </body>
