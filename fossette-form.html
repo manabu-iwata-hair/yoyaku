@@ -68,6 +68,20 @@
   .btns{display:grid;gap:10px;margin-top:14px}
   .ghost{min-height:48px;border-radius:999px;border:1px solid var(--line);background:#fff;font:inherit;font-size:15px;color:var(--ink);cursor:pointer}
 
+  /* 送るカード（確認画面） */
+  .preview{padding:0;background:none;border:0;white-space:normal}
+  .fx{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(63,51,39,.10);max-width:340px;margin:0 auto}
+  .fx-head{background:#5F7A4F;color:#fff;padding:14px 16px}
+  .fx-head small{display:block;font-size:10px;color:#E3ECDC;letter-spacing:.05em}
+  .fx-head b{font-size:18px}
+  .fx-body{padding:16px;display:grid;gap:12px;font-size:14px;line-height:1.6}
+  .fx-body hr{border:0;border-top:1px solid var(--line)}
+  .fx-name{font-size:21px;font-weight:700}
+  .fx-name small{display:block;font-size:11px;font-weight:400;color:var(--sub)}
+  .fx-label{font-size:11px;font-weight:700;color:var(--gold)}
+  .fx-est{display:flex;justify-content:space-between;align-items:baseline}
+  .fx-est span{font-size:11px;color:var(--sub)}
+  .fx-foot{background:#F8F2E8;padding:10px 16px;font-size:10.5px;color:var(--sub)}
   /* 送った後 */
   .done{display:none;text-align:center;padding:40px 24px}
   .done.show{display:block}
@@ -158,7 +172,7 @@
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
   <div class="sheet-in">
     <h2 id="sheetTitle">この内容で送ります</h2>
-    <p class="sub">LINEのトークに、あなたから送られます</p>
+    <p class="sub">このカードが、あなたからLINEのトークに送られます</p>
     <div class="preview" id="preview"></div>
     <div class="btns">
       <button class="cta line" type="button" id="sendBtn" style="border:0;font-family:inherit">LINEで送る</button>
@@ -259,22 +273,91 @@ function check(k){
 }
 f.addEventListener('input', clearBad); f.addEventListener('change', clearBad);
 
-/* 送る文 */
-function buildText(){
-  const sel = [...document.querySelectorAll('input[name=menu]:checked')].map(i=>i.value);
-  const bleach = document.querySelector('input[name=bleach]:checked').value;
-  const hasColor = [...document.querySelectorAll('input[name=menu]:checked')].some(i=>i.dataset.color);
-  const lines = ['【fossette ご予約リクエスト】', ''];
-  lines.push('■ お名前', E.name.value.trim() + '（' + E.visit.value + '）', '');
-  lines.push('■ メニュー', sel.join('、') + (hasColor ? `\nブリーチ・ダブルカラー：${bleach}` : ''));
+/* 送る内容をまとめる */
+function collect(){
+  const checked = [...document.querySelectorAll('input[name=menu]:checked')];
+  const hasColor = checked.some(i=>i.dataset.color);
   const est = document.getElementById('estimate');
-  if (!est.hidden) lines.push('目安：' + document.getElementById('estimateVal').textContent);
-  lines.push('', '■ ご希望の日にち');
-  [1,2,3].forEach(n => { const v = E['d'+n].value; if (v) lines.push(`第${n}希望　${fmtDate(v)} ${E['t'+n].value}`); });
-  if (E.wishNote.value.trim()) lines.push(E.wishNote.value.trim());
-  if (E.tel.value.trim()) lines.push('', '■ お電話番号', E.tel.value.trim());
-  if (E.note.value.trim()) lines.push('', '■ お悩み・ご要望', E.note.value.trim());
-  return lines.join('\n');
+  return {
+    name: E.name.value.trim(),
+    visit: E.visit.value,
+    menu: checked.map(i=>i.value),
+    bleach: hasColor ? document.querySelector('input[name=bleach]:checked').value : '',
+    estimate: est.hidden ? '' : document.getElementById('estimateVal').textContent,
+    wishes: [1,2,3].filter(n=>E['d'+n].value).map(n=>`第${n}希望　${fmtDate(E['d'+n].value)} ${E['t'+n].value}`),
+    wishNote: E.wishNote.value.trim(),
+    tel: E.tel.value.trim(),
+    note: E.note.value.trim(),
+  };
+}
+/* 文（予備用） */
+function buildText(x){
+  const L = ['【fossette ご予約リクエスト】', '', '■ お名前', `${x.name} 様（${x.visit}）`, '', '■ メニュー', x.menu.join('、')];
+  if (x.bleach) L.push('ブリーチ・ダブルカラー：' + x.bleach);
+  if (x.estimate) L.push('目安：' + x.estimate);
+  L.push('', '■ ご希望の日にち', ...x.wishes);
+  if (x.wishNote) L.push(x.wishNote);
+  if (x.tel) L.push('', '■ お電話番号', x.tel);
+  if (x.note) L.push('', '■ お悩み・ご要望', x.note);
+  return L.join('\n');
+}
+/* カード（Flex Message）：トークで画像のように見える */
+const C = { leaf:'#5F7A4F', gold:'#A8822E', ink:'#3F3327', sub:'#7A6A58', line:'#E8DCC8' };
+function flexSection(label, lines){
+  return { type:'box', layout:'vertical', spacing:'xs', contents:[
+    { type:'text', text:label, size:'xs', weight:'bold', color:C.gold },
+    ...lines.map(t => ({ type:'text', text:t, size:'sm', color:C.ink, wrap:true })),
+  ]};
+}
+function buildFlex(x){
+  const body = [
+    { type:'box', layout:'vertical', contents:[
+      { type:'text', text:`${x.name} 様`, size:'xl', weight:'bold', color:C.ink, wrap:true },
+      { type:'text', text:`ご来店：${x.visit}`, size:'xs', color:C.sub },
+    ]},
+    { type:'separator', color:C.line },
+    flexSection('メニュー', [x.menu.join('、'), ...(x.bleach ? ['ブリーチ・ダブルカラー：' + x.bleach] : [])]),
+  ];
+  if (x.estimate) body.push({ type:'box', layout:'baseline', contents:[
+    { type:'text', text:'目安の料金', size:'xs', color:C.sub, flex:0 },
+    { type:'text', text:x.estimate, size:'md', weight:'bold', color:C.ink, align:'end' },
+  ]});
+  body.push(flexSection('ご希望の日にち', [...x.wishes, ...(x.wishNote ? [x.wishNote] : [])]));
+  if (x.tel) body.push(flexSection('お電話番号', [x.tel]));
+  if (x.note) body.push(flexSection('お悩み・ご要望', [x.note]));
+  return {
+    type:'flex',
+    altText:`【fossette ご予約リクエスト】${x.name} 様`.slice(0, 400),
+    contents:{
+      type:'bubble', size:'mega',
+      header:{ type:'box', layout:'vertical', backgroundColor:C.leaf, paddingAll:'16px', contents:[
+        { type:'text', text:'fossette  hair & eyelash', size:'xxs', color:'#E3ECDC' },
+        { type:'text', text:'ご予約リクエスト', size:'lg', weight:'bold', color:'#FFFFFF' },
+      ]},
+      body:{ type:'box', layout:'vertical', spacing:'md', paddingAll:'16px', contents: body },
+      footer:{ type:'box', layout:'vertical', backgroundColor:'#F8F2E8', paddingAll:'12px', contents:[
+        { type:'text', text:'※まだ予約は確定していません。空きを確認してお返事します。', size:'xxs', color:C.sub, wrap:true },
+      ]},
+    },
+  };
+}
+/* 確認画面のカード（送るカードと同じ形） */
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderCard(x){
+  const sec = (label, lines) => `<div class="fx-sec"><div class="fx-label">${label}</div>${lines.map(l=>`<div>${esc(l)}</div>`).join('')}</div>`;
+  return `<div class="fx">
+    <div class="fx-head"><small>fossette  hair &amp; eyelash</small><b>ご予約リクエスト</b></div>
+    <div class="fx-body">
+      <div class="fx-name">${esc(x.name)} 様<small>ご来店：${esc(x.visit)}</small></div>
+      <hr>
+      ${sec('メニュー', [x.menu.join('、'), ...(x.bleach ? ['ブリーチ・ダブルカラー：' + x.bleach] : [])])}
+      ${x.estimate ? `<div class="fx-est"><span>目安の料金</span><b>${esc(x.estimate)}</b></div>` : ''}
+      ${sec('ご希望の日にち', [...x.wishes, ...(x.wishNote ? [x.wishNote] : [])])}
+      ${x.tel ? sec('お電話番号', [x.tel]) : ''}
+      ${x.note ? sec('お悩み・ご要望', [x.note]) : ''}
+    </div>
+    <div class="fx-foot">※まだ予約は確定していません。空きを確認してお返事します。</div>
+  </div>`;
 }
 
 /* 確認 → 送る */
@@ -283,7 +366,7 @@ document.getElementById('toConfirm').onclick = () => {
   const bad = ['menu','wish','name'].filter(k=>!check(k));
   document.querySelectorAll('.q').forEach(q=>q.classList.toggle('bad', bad.includes(q.dataset.q)));
   if (bad.length){ document.querySelector(`.q[data-q=${bad[0]}]`).scrollIntoView({behavior:'smooth',block:'center'}); return; }
-  document.getElementById('preview').textContent = buildText();
+  document.getElementById('preview').innerHTML = renderCard(collect());
   sheet.classList.add('open');
 };
 document.getElementById('backBtn').onclick = () => sheet.classList.remove('open');
@@ -297,14 +380,17 @@ startLiff();
 
 const sendBtn = document.getElementById('sendBtn');
 sendBtn.onclick = async () => {
-  const text = buildText();
+  const x = collect(), text = buildText(x);
   sendBtn.disabled = true; sendBtn.textContent = '送っています…';
   if (liffReady){
-    try {
-      // お客さん本人のメッセージとしてトークに送る（公式LINEの送信数には入らない）
-      await liff.sendMessages([{type:'text', text}, {type:'text', text: DONE_KEYWORD}]);
-      sheet.classList.remove('open'); showDone(); return;
-    } catch(e){ /* だめなときは下の予備の方法へ */ }
+    // お客さん本人のメッセージとしてトークに送る（公式LINEの送信数には入らない）
+    // まずカード（Flex）で送り、だめなら文で送る
+    for (const first of [buildFlex(x), {type:'text', text}]){
+      try {
+        await liff.sendMessages([first, {type:'text', text: DONE_KEYWORD}]);
+        sheet.classList.remove('open'); showDone(); return;
+      } catch(e){ /* 次の方法へ */ }
+    }
   }
   // 予備：LINEのトークを開いて、文を入れた状態にする（お客さんが送信を押す）
   location.href = `https://line.me/R/oaMessage/${encodeURIComponent(OA_ID)}/?${encodeURIComponent(text)}`;
