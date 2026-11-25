@@ -372,6 +372,9 @@ document.getElementById('toConfirm').onclick = () => {
 document.getElementById('backBtn').onclick = () => sheet.classList.remove('open');
 
 let liffReady = false;
+const GO = new URLSearchParams(location.search).get('go');
+const GO_PAGES = ['index','agu','fossette','menu','soudan'];
+if (GO_PAGES.includes(GO)) document.documentElement.style.visibility = 'hidden';
 async function startLiff(){
   // 確認用（あとで消す）：いちばん下に小さく出す。1つ進むごとに書き足す
   const d = document.createElement('p');
@@ -383,13 +386,16 @@ async function startLiff(){
   if (!LIFF_ID || !window.liff){ log('no-liff'); return; }
   try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); log('init ok inClient=' + liffReady); }
   catch(e){ liffReady = false; log('init err ' + (e.code||'') + ' ' + (e.message||e)); }
+  // リッチメニューの「ご予約」は ?go=index で来る → LIFF のまま、サロンを選ぶページへ
+  if (GO_PAGES.includes(GO)) { location.replace(GO + '.html'); return; }
   if (!liffReady) return;
   try {
     const c = liff.getContext() || {};
     log('type=' + c.type + ' scope=' + (c.scope||[]).join(',') + ' v=' + liff.getVersion());
     const p = await liff.permission.query('chat_message.write');
     log('perm=' + p.state);
-    if (p.state !== 'granted'){ log('requestAll…'); await liff.permission.requestAll(); log('requestAll done'); }
+    // トークから開いていない（type=none）と、トークに送れない → 予備の方法にする
+    if (c.type === 'none') { liffReady = false; log('not from chat'); }
   } catch(e){ log('err ' + (e.code||'') + ' ' + (e.message||e)); }
 }
 startLiff();
