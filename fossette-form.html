@@ -375,6 +375,13 @@ let liffReady = false;
 async function startLiff(){
   if (!LIFF_ID || !window.liff) return;
   try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); } catch(e){ liffReady = false; }
+  // トークに送る許可（chat_message.write）がまだなら、最初に許可の画面を出す（入力の前に）
+  if (liffReady){
+    try {
+      const p = await liff.permission.query('chat_message.write');
+      if (p.state !== 'granted') await liff.permission.requestAll();
+    } catch(e){}
+  }
 }
 startLiff();
 
@@ -388,13 +395,13 @@ sendBtn.onclick = async () => {
     const errs = [];
     for (const first of [buildFlex(x), {type:'text', text}]){
       try {
-        await liff.sendMessages([first, {type:'text', text: DONE_KEYWORD}]);
+        const msgs = [first, {type:'text', text: DONE_KEYWORD}];
+        if (errs.length) msgs.push({type:'text', text: '（確認用）カードで送れなかった理由：\n' + errs.join('\n').slice(0, 1000)});
+        await liff.sendMessages(msgs);
         sheet.classList.remove('open'); showDone(errs); return;
       } catch(e){ errs.push(`${first.type}: ${e.code||''} ${e.message||e}`); /* 次の方法へ */ }
     }
     alert('送れませんでした（確認用）\n' + errs.join('\n'));
-  } else {
-    alert('確認用：LINEの中で開いていないため、トークに文を入れます');
   }
   // 予備：LINEのトークを開いて、文を入れた状態にする（お客さんが送信を押す）
   location.href = `https://line.me/R/oaMessage/${encodeURIComponent(OA_ID)}/?${encodeURIComponent(text)}`;
