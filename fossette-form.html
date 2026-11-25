@@ -376,27 +376,12 @@ const GO = new URLSearchParams(location.search).get('go');
 const GO_PAGES = ['index','agu','fossette','menu','soudan'];
 if (GO_PAGES.includes(GO)) document.documentElement.style.visibility = 'hidden';
 async function startLiff(){
-  // 確認用（あとで消す）：いちばん下に小さく出す。1つ進むごとに書き足す
-  const d = document.createElement('p');
-  d.style.cssText = 'font-size:11px;color:#999;text-align:center;padding:8px 16px 140px;word-break:break-all';
-  document.body.appendChild(d);
-  const dbg = [];
-  const log = t => { dbg.push(t); d.textContent = '確認用：' + dbg.join(' / '); };
-  log('start');
-  if (!LIFF_ID || !window.liff){ log('no-liff'); return; }
-  try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); log('init ok inClient=' + liffReady); }
-  catch(e){ liffReady = false; log('init err ' + (e.code||'') + ' ' + (e.message||e)); }
+  if (!LIFF_ID || !window.liff) return;
+  try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); } catch(e){ liffReady = false; }
   // リッチメニューの「ご予約」は ?go=index で来る → LIFF のまま、サロンを選ぶページへ
   if (GO_PAGES.includes(GO)) { location.replace(GO + '.html'); return; }
-  if (!liffReady) return;
-  try {
-    const c = liff.getContext() || {};
-    log('type=' + c.type + ' scope=' + (c.scope||[]).join(',') + ' v=' + liff.getVersion());
-    const p = await liff.permission.query('chat_message.write');
-    log('perm=' + p.state);
-    // トークから開いていない（type=none）と、トークに送れない → 予備の方法にする
-    if (c.type === 'none') { liffReady = false; log('not from chat'); }
-  } catch(e){ log('err ' + (e.code||'') + ' ' + (e.message||e)); }
+  // トークから開いていない（type=none）と、トークに送れない → 予備の方法にする
+  try { if (liffReady && (liff.getContext() || {}).type === 'none') liffReady = false; } catch(e){}
 }
 startLiff();
 
@@ -407,28 +392,18 @@ sendBtn.onclick = async () => {
   if (liffReady){
     // お客さん本人のメッセージとしてトークに送る（公式LINEの送信数には入らない）
     // まずカード（Flex）で送り、だめなら文で送る
-    const errs = [];
     for (const first of [buildFlex(x), {type:'text', text}]){
       try {
-        const msgs = [first, {type:'text', text: DONE_KEYWORD}];
-        if (errs.length) msgs.push({type:'text', text: '（確認用）カードで送れなかった理由：\n' + errs.join('\n').slice(0, 1000)});
-        await liff.sendMessages(msgs);
-        sheet.classList.remove('open'); showDone(errs); return;
-      } catch(e){ errs.push(`${first.type}: ${e.code||''} ${e.message||e}`); /* 次の方法へ */ }
+        await liff.sendMessages([first]); // カードだけ送る（2026-11-25 まなさんの希望）
+        sheet.classList.remove('open'); showDone(); return;
+      } catch(e){ /* 次の方法へ */ }
     }
-    alert('送れませんでした（確認用）\n' + errs.join('\n'));
   }
   // 予備：LINEのトークを開いて、文を入れた状態にする（お客さんが送信を押す）
   location.href = `https://line.me/R/oaMessage/${encodeURIComponent(OA_ID)}/?${encodeURIComponent(text)}`;
   setTimeout(()=>{ sendBtn.disabled=false; sendBtn.textContent='LINEで送る'; }, 1500);
 };
-function showDone(errs){
-  if (errs && errs.length){
-    const p = document.createElement('p');
-    p.style.cssText = 'font-size:11px;color:#999;margin-top:16px;word-break:break-all';
-    p.textContent = '（確認用）カードで送れなかったため、文で送りました：' + errs.join(' / ');
-    document.getElementById('doneView').appendChild(p);
-  }
+function showDone(){
   document.getElementById('formView').style.display='none';
   document.getElementById('bottomBar').style.display='none';
   document.getElementById('doneView').classList.add('show');
