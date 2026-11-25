@@ -394,7 +394,7 @@ sendBtn.onclick = async () => {
     // まずカード（Flex）で送り、だめなら文で送る
     for (const first of [buildFlex(x), {type:'text', text}]){
       try {
-        await liff.sendMessages([first]); // カードだけ送る（2026-11-25 まなさんの希望）
+        await liff.sendMessages([first, {type:'text', text: DONE_KEYWORD}]); // 2通目は自動返信のキーワード（文でないと自動返信が動かない）
         sheet.classList.remove('open'); showDone(); return;
       } catch(e){ /* 次の方法へ */ }
     }
