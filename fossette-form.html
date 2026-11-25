@@ -373,26 +373,24 @@ document.getElementById('backBtn').onclick = () => sheet.classList.remove('open'
 
 let liffReady = false;
 async function startLiff(){
-  if (!LIFF_ID || !window.liff) return;
-  try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); } catch(e){ liffReady = false; }
-  // トークに送る許可（chat_message.write）がまだなら、最初に許可の画面を出す（入力の前に）
-  const dbg = [];
-  if (liffReady){
-    try {
-      const c = liff.getContext() || {};
-      dbg.push('type=' + c.type, 'scope=' + (c.scope||[]).join(','), 'v=' + liff.getVersion());
-      const p = await liff.permission.query('chat_message.write');
-      dbg.push('perm=' + p.state);
-      if (p.state !== 'granted') await liff.permission.requestAll();
-    } catch(e){ dbg.push('err=' + (e.code||'') + ' ' + (e.message||e)); }
-  } else {
-    dbg.push('inClient=' + (window.liff && liff.isInClient ? liff.isInClient() : 'none'));
-  }
-  // 確認用（あとで消す）：いちばん下に小さく出す
+  // 確認用（あとで消す）：いちばん下に小さく出す。1つ進むごとに書き足す
   const d = document.createElement('p');
-  d.style.cssText = 'font-size:10px;color:#aaa;text-align:center;padding:8px 16px 120px;word-break:break-all';
-  d.textContent = '確認用：' + dbg.join(' / ');
+  d.style.cssText = 'font-size:11px;color:#999;text-align:center;padding:8px 16px 140px;word-break:break-all';
   document.body.appendChild(d);
+  const dbg = [];
+  const log = t => { dbg.push(t); d.textContent = '確認用：' + dbg.join(' / '); };
+  log('start');
+  if (!LIFF_ID || !window.liff){ log('no-liff'); return; }
+  try { await liff.init({ liffId: LIFF_ID }); liffReady = liff.isInClient(); log('init ok inClient=' + liffReady); }
+  catch(e){ liffReady = false; log('init err ' + (e.code||'') + ' ' + (e.message||e)); }
+  if (!liffReady) return;
+  try {
+    const c = liff.getContext() || {};
+    log('type=' + c.type + ' scope=' + (c.scope||[]).join(',') + ' v=' + liff.getVersion());
+    const p = await liff.permission.query('chat_message.write');
+    log('perm=' + p.state);
+    if (p.state !== 'granted'){ log('requestAll…'); await liff.permission.requestAll(); log('requestAll done'); }
+  } catch(e){ log('err ' + (e.code||'') + ' ' + (e.message||e)); }
 }
 startLiff();
 
